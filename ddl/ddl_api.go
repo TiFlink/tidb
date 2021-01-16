@@ -1964,7 +1964,7 @@ func (d *ddl) CreateView(ctx sessionctx.Context, s *ast.CreateViewStmt) (err err
 		onExist = OnExistReplace
 	}
 
-	jsonValue, err := json.Marshal(viewInfo)
+	jsonValue, err := json.Marshal(tbInfo)
 	if err != nil {
 		logutil.BgLogger().Info("err json")
 	}
