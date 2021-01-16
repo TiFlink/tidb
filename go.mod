@@ -85,3 +85,5 @@ require (
 )
 
 go 1.13
+
+replace github.com/pingcap/parser => gitee.com/jiangplus/tidb-parser v0.0.0-20210115160814-d9f7a392e5b7

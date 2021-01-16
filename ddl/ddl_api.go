@@ -18,9 +18,14 @@
 package ddl
 
 import (
+	"bytes"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"math"
+	"net/http"
 	"strconv"
 	"strings"
 	"sync/atomic"
@@ -1959,7 +1964,26 @@ func (d *ddl) CreateView(ctx sessionctx.Context, s *ast.CreateViewStmt) (err err
 		onExist = OnExistReplace
 	}
 
+	jsonValue, err := json.Marshal(viewInfo)
+	if err != nil {
+		logutil.BgLogger().Info("err json")
+	}
+	logutil.BgLogger().Info(string(jsonValue))
+	request(bytes.NewBuffer(jsonValue))
+
 	return d.CreateTableWithInfo(ctx, s.ViewName.Schema, tbInfo, onExist, false /*tryRetainID*/)
+}
+
+func request(data io.Reader) {
+	resp, err := http.Post("http://localhost:9988", "application/json", data)
+	if err != nil {
+		logutil.BgLogger().Info("http request err")
+		return
+	}
+	// defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	logutil.BgLogger().Info(string(body))
 }
 
 func buildViewInfo(ctx sessionctx.Context, s *ast.CreateViewStmt) (*model.ViewInfo, error) {
